@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "907404870375",
+    "project_id": "geolocation-2bc66"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:907404870375:android:3a1597dac8c2905a",
+        "android_client_info": {
+          "package_name": "br.com.natanaelribeiro.www.geolocation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "907404870375-2jglnl3i1l4ihl2rd1dh1m1iq9r1r3jn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.natanaelribeiro.www.geolocation",
+            "certificate_hash": "F3B8627D14E3F984BBA6393DF30D86781AE2A899"
+          }
+        },
+        {
+          "client_id": "907404870375-1j6elhn90mkkjdn6a5db278j8nacmf8r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9licYwtdcXOqRRsQX0Rz0Hfr6IPpUMEg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
