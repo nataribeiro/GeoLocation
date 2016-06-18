@@ -23,6 +23,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.clustering.ClusterManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -32,12 +37,16 @@ public class HomeActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private Marker markerMyLocation;
     private LatLng[] posicoes = new LatLng[10];
+    private List<LatLng> listClusters;
+    private ClusterManager mClusterManager;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        listClusters = new ArrayList<>();
 
         posicoes[0] = new LatLng(-29.983067, -51.192679);
         posicoes[1] = new LatLng(-29.976004, -51.170492);
@@ -117,15 +126,45 @@ public class HomeActivity extends FragmentActivity implements OnMapReadyCallback
         //circle.radius(2000);
         //mMap.addCircle(circle);
 
+        //for (LatLng posicao : posicoes){
+        //    MarkerOptions mOpt = new MarkerOptions();
+        //    mOpt.position(posicao);
+        //    mMap.addMarker(mOpt);
+        //}
+
+        mClusterManager = new ClusterManager<MyItem>(this, mMap);
         for (LatLng posicao : posicoes){
-            MarkerOptions mOpt = new MarkerOptions();
-            mOpt.position(posicao);
-            mMap.addMarker(mOpt);
+            MyItem offsetItem = new MyItem(posicao.latitude, posicao.longitude);
+            mClusterManager.addItem(offsetItem);
         }
+
+        mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener() {
+            @Override
+            public boolean onClusterItemClick(ClusterItem clusterItem) {
+                listClusters.add(new LatLng(clusterItem.getPosition().latitude, clusterItem.getPosition().longitude));
+                atualizaLinha();
+                return false;
+            }
+        });
+
+        mMap.setOnCameraChangeListener(mClusterManager);
+        mMap.setOnMarkerClickListener(mClusterManager);
+
+
 
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
         showMe();
+    }
+
+    public void atualizaLinha(){
+        PolylineOptions polOpt = new PolylineOptions();
+        for(LatLng ll : listClusters){
+            polOpt.add(ll);
+        }
+        polOpt.color(Color.BLUE);
+        polOpt.width(3);
+        mMap.addPolyline(polOpt);
     }
 
     public void showMe() { //fakegps
