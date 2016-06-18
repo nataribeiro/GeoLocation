@@ -1,27 +1,17 @@
-import java.util.List;
+package br.com.natanaelribeiro.www.geolocation;
 
-import okhttp3.RequestBody;
 import retrofit2.Call;
-import retrofit2.http.Body;
 import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
 
+/**
+ * Created by 631610277 on 18/06/16.
+ */
 public interface MyInterfaceRetrofit {
 
-    @GET("listaviagens")
+    @GET("v2/576539791100005a0ea92a52")
     Call<Posicoes> searchPositions();
 
-              /*@Query("withdraw_coordinates") String withdraw_coordinates,
-               @Query("withdraw_radius") int withdraw_radius*/
 
-       /*@POST("api/user/store")
-       Call<User> createUser(
-               @Body RequestBody user);
-
-       @GET("api/user/{id}")
-       Call<User> getUser(
-               @Path("id") String userId);
-   */
 }
+
+

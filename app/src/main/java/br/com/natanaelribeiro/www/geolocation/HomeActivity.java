@@ -8,6 +8,7 @@ import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -28,6 +29,10 @@ import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -60,7 +65,7 @@ public class HomeActivity extends FragmentActivity implements OnMapReadyCallback
         posicoes[9] = new LatLng(-30.063090, -51.156959);
 
 
-    // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -112,13 +117,14 @@ public class HomeActivity extends FragmentActivity implements OnMapReadyCallback
             requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);//request code
             return;
         }
+        //################# Desenhos ###################//
         //PolylineOptions polOpt = new PolylineOptions();
         //polOpt.add(new LatLng(-30.032564, -51.227706));
         //polOpt.add(new LatLng(-30.035556, -51.227968));
         //polOpt.color(Color.BLUE);
         //polOpt.width(3);
         //mMap.addPolyline(polOpt);
-//
+
         //CircleOptions circle = new CircleOptions();
         //circle.center(new LatLng(-29.974045, -51.194889));
         //circle.fillColor(Color.BLUE);
@@ -132,11 +138,30 @@ public class HomeActivity extends FragmentActivity implements OnMapReadyCallback
         //    mMap.addMarker(mOpt);
         //}
 
-        mClusterManager = new ClusterManager<MyItem>(this, mMap);
-        for (LatLng posicao : posicoes){
-            MyItem offsetItem = new MyItem(posicao.latitude, posicao.longitude);
-            mClusterManager.addItem(offsetItem);
-        }
+        //################# Cluster ###################//
+        //mClusterManager = new ClusterManager<MyItem>(this, mMap);
+        //for (LatLng posicao : posicoes){
+        //    MyItem offsetItem = new MyItem(posicao.latitude, posicao.longitude);
+        //    mClusterManager.addItem(offsetItem);
+        //}
+
+        //mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener() {
+        //    @Override
+        //    public boolean onClusterItemClick(ClusterItem clusterItem) {
+        //        listClusters.add(new LatLng(clusterItem.getPosition().latitude, clusterItem.getPosition().longitude));
+        //        atualizaLinha();
+        //        return false;
+        //    }
+        //});
+
+        //mMap.setOnCameraChangeListener(mClusterManager);
+        //mMap.setOnMarkerClickListener(mClusterManager);
+
+
+
+        //LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
+        mClusterManager = new ClusterManager<MyItem>(HomeActivity.this, mMap);
 
         mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener() {
             @Override
@@ -147,19 +172,35 @@ public class HomeActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        mMap.setOnCameraChangeListener(mClusterManager);
-        mMap.setOnMarkerClickListener(mClusterManager);
+        Call<Posicoes> call = ((CursoApplication) getApplication()).service.searchPositions();
+        call.enqueue(new Callback<Posicoes>() {
+            @Override
+            public void onResponse(Call<Posicoes> call, Response<Posicoes> response) {
+
+                for (Posicao posicao : response.body().posicoes) {
+                    MyItem offsetItem = new MyItem(posicao.latitude, posicao.longitude);
+                    mClusterManager.addItem(offsetItem);
+                }
+
+                mMap.setOnCameraChangeListener(mClusterManager);
+                mMap.setOnMarkerClickListener(mClusterManager);
+            }
+
+            @Override
+            public void onFailure(Call<Posicoes> call, Throwable t) {
+                Log.e("CURSO", "Pepino: " + t.getLocalizedMessage());
+            }
+        });
 
 
 
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
         showMe();
     }
 
-    public void atualizaLinha(){
+    public void atualizaLinha() {
         PolylineOptions polOpt = new PolylineOptions();
-        for(LatLng ll : listClusters){
+        for (LatLng ll : listClusters) {
             polOpt.add(ll);
         }
         polOpt.color(Color.BLUE);
@@ -176,11 +217,11 @@ public class HomeActivity extends FragmentActivity implements OnMapReadyCallback
         updateCamera(mLastLocation);
     }
 
-    public void updateCamera(Location loc){
+    public void updateCamera(Location loc) {
         LatLng eu = new LatLng(loc.getLatitude(), loc.getLongitude());
-        if(markerMyLocation == null) {
+        if (markerMyLocation == null) {
             markerMyLocation = mMap.addMarker(new MarkerOptions().position(eu).title("Estou aqui"));
-        }else {
+        } else {
             markerMyLocation.setPosition(eu);
         }
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(eu, 16));
@@ -188,8 +229,8 @@ public class HomeActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if(requestCode == 1) {
-            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 showMe();
             }
         }

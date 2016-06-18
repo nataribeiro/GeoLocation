@@ -1,6 +1,7 @@
 package br.com.natanaelribeiro.www.geolocation;
 
 import android.app.Application;
+import android.app.Service;
 
 import com.facebook.FacebookSdk;
 import com.google.gson.Gson;
@@ -14,6 +15,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by Natanael on 08/06/2016.
  */
 public class CursoApplication extends Application {
+
+    public MyInterfaceRetrofit service;
 
     @Override
     public void onCreate() {
